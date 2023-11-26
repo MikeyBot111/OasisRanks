@@ -133,6 +133,8 @@ namespace OasisRanks
                     ReturnStats.Deaths = reader2.GetInt32("deaths");
                     ReturnStats.HDKills = reader2.GetInt32("hdkills");
                     ReturnStats.PlaytimeSeconds = reader2.GetInt32("playtimeSeconds");
+                    ReturnStats.PlayerID = (CSteamID)ulong.Parse(reader2.GetString("csteamid"));
+                    ReturnStats.Username = reader2.GetString("username");
                 }
                 reader2.Close();
 
@@ -157,6 +159,105 @@ namespace OasisRanks
                 ReturnStats.Rank = i;
 
                 if ( ReturnStats.Kills != 0)
+                {
+                    ReturnStats.Accuracy = (float)ReturnStats.HDKills / (float)ReturnStats.Kills;
+                }
+                else
+                {
+                    ReturnStats.Accuracy = 0;
+                }
+
+                if (ReturnStats.Deaths != 0)
+                {
+                    ReturnStats.KDR = (float)ReturnStats.Kills / (float)ReturnStats.Deaths;
+                }
+                else
+                {
+                    ReturnStats.KDR = ReturnStats.Kills;
+                }
+                ReturnStats.Accuracy *= 100;
+                mySqlConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning("MySql RetrieveUser Failed");
+                Logger.LogException(ex);
+                mySqlConnection.Close();
+            }
+
+            return ReturnStats;
+        }
+
+        internal static PlayerRankComponent RetrieveUserByName(string Username)
+        {
+            PlayerRankComponent ReturnStats = new PlayerRankComponent();
+
+            MySqlConnection mySqlConnection = Database.CreateConnection();
+            if (mySqlConnection == null)
+            {
+                Logger.LogWarning("MySql RetrieveUser Failed - Connection null");
+                return new PlayerRankComponent();
+            }
+
+            try
+            {
+                int num = 0;
+
+                string[] args = { "@Tablename", "@username" };
+                string[] argsValues = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName, Username };
+                string cmd = "SELECT COUNT(*) FROM `@Tablename` WHERE `username` LIKE '%@username%';";
+                MySqlCommand command1 = mySqlConnection.CreateCommand();
+                command1.CommandText = CompileArguments(cmd, args, argsValues);
+                var reader = command1.ExecuteReader();
+                while (reader.Read())
+                {
+                    num = reader.GetInt32(0);
+                }
+                reader.Close();
+                if (num == 0)
+                {
+                    return new PlayerRankComponent();
+                }
+
+                string[] args2 = { "@Tablename", "@username" };
+                string[] argsValues2 = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName, Username };
+                string cmd2 = "SELECT * FROM `@Tablename` WHERE `username` LIKE '%@username%' ORDER BY id;";
+                MySqlCommand command2 = mySqlConnection.CreateCommand();
+                command2.CommandText = CompileArguments(cmd2, args2, argsValues2);
+                var reader2 = command2.ExecuteReader();
+
+                while (reader2.Read())
+                {
+                    ReturnStats.Kills = reader2.GetInt32("kills");
+                    ReturnStats.Deaths = reader2.GetInt32("deaths");
+                    ReturnStats.HDKills = reader2.GetInt32("hdkills");
+                    ReturnStats.PlaytimeSeconds = reader2.GetInt32("playtimeSeconds");
+                    ReturnStats.PlayerID = (CSteamID)ulong.Parse(reader2.GetString("csteamid"));
+                    ReturnStats.Username = reader2.GetString("username");
+                }
+                reader2.Close();
+
+                string[] args3 = { "@Tablename" };
+                string[] argsValues3 = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName };
+                string cmd3 = "SELECT * FROM `@Tablename` ORDER BY `kills` DESC;";
+                MySqlCommand command3 = mySqlConnection.CreateCommand();
+                command3.CommandText = CompileArguments(cmd3, args3, argsValues3);
+                var reader3 = command3.ExecuteReader();
+
+                int i = 0;
+                while (reader3.Read())
+                {
+                    i++;
+                    if (reader3.GetString("csteamid") == ReturnStats.PlayerID.ToString())
+                    {
+                        break;
+                    }
+                }
+                reader3.Close();
+
+                ReturnStats.Rank = i;
+
+                if (ReturnStats.Kills != 0)
                 {
                     ReturnStats.Accuracy = (float)ReturnStats.HDKills / (float)ReturnStats.Kills;
                 }

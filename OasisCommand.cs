@@ -69,23 +69,23 @@ namespace OasisRanks
                 return;
             }
 
-            UnturnedPlayer PlayerToLookup = UnturnedPlayer.FromName(command[0].ToString());
-            if (PlayerToLookup == null)
+            PlayerRankComponent PlayerToLookup = Database.RetrieveUserByName(command[0].ToString());
+
+            if (PlayerToLookup.Username == null)
             {
                 UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_no_player"), UnityEngine.Color.red);
                 return;
             }
 
-            PlayerRankComponent Player = Database.RetrieveUser(PlayerToLookup.CSteamID);
-            if (Player.Rank == 0)
+            if (PlayerToLookup.Rank == 0)
             {
                 UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_no_player"), UnityEngine.Color.red);
                 return;
             }
 
-            UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_show_0", PlayerToLookup.CharacterName, Player.Rank, Player.PlaytimeSeconds), UnityEngine.Color.green);
-            UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_show_1", Player.Kills, Player.Deaths, Player.Accuracy), UnityEngine.Color.green);
-            UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_show_2", Player.KDR, Player.HDKills), UnityEngine.Color.green);
+            UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_show_0", PlayerToLookup.Username, PlayerToLookup.Rank, PlayerToLookup.PlaytimeSeconds), UnityEngine.Color.green);
+            UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_show_1", PlayerToLookup.Kills, PlayerToLookup.Deaths, PlayerToLookup.Accuracy), UnityEngine.Color.green);
+            UnturnedChat.Say(caller, OasisPlugin.Instance.Translate("stats_show_2", PlayerToLookup.KDR, PlayerToLookup.HDKills), UnityEngine.Color.green);
 
         }
     }
