@@ -15,7 +15,7 @@ namespace OasisRanks
 {
     public class OasisPlugin : RocketPlugin<OasisConfiguration>
     {
-        public static string version = "1.0.0.1";
+        public static string version = "1.0.0.2";
         public static OasisPlugin Instance;
 
         public static Dictionary<CSteamID, DateTime> PlayerPlaytime = new Dictionary<CSteamID, DateTime>();
@@ -26,12 +26,16 @@ namespace OasisRanks
             {
                 return new TranslationList
                 {
-                    { "stats_not_enabled", "[Oasis] Ranks nejsou aktivované." },
-                    { "stats_no_permissions", "[Oasis] Nemáš oprávnění na tento příkaz." },
+                    { "no_permissions", "[Oasis] Nemáš oprávnění na tento příkaz." },
+                    { "not_enabled", "[Oasis] Tento příkaz není aktivovaný." },
+                    { "cooldown", "[Oasis] Tento příkaz bude dostupný za {0}s." },
+
                     { "stats_no_player", "[Oasis] Hráč nenalezen." },
                     { "stats_show_0", "[Oasis] Hráč => {0}, Rank => {1}, Doba hraní => {2}s " },
                     { "stats_show_1", "[Oasis] Killů => {0}, Umrtí => {1}, Přesnost => {2}% " },
                     { "stats_show_2", "[Oasis] KDR => {0}, Headshot killy => {1} " },
+
+                    { "ranks_player", "[Oasis] [{0}] {1} ,Killů => {2} ,Umrtí => {3}, KDR => {4}, Přesnost => {5}%" },
                 };
             }
         }

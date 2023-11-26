@@ -1,10 +1,8 @@
 ﻿using Rocket.Core.Logging;
-using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using MySqlConnector;
-
 
 namespace OasisRanks
 {
@@ -75,7 +73,7 @@ namespace OasisRanks
 
                     string[] args2 = { "@Tablename" };
                     string[] argsValues2 = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName };
-                    string cmd2 = "CREATE TABLE `@Tablename` (`id` int(11) NOT NULL AUTO_INCREMENT,`kills` int(11) NOT NULL,`deaths` int(11) NOT NULL,`playtimeSeconds` int(11) NOT NULL,`hdkills` int(11) NOT NULL,`csteamid` varchar(32) NOT NULL,PRIMARY KEY (`id`))";
+                    string cmd2 = "CREATE TABLE `@Tablename` (`id` int(11) NOT NULL AUTO_INCREMENT,`kills` int(11) NOT NULL,`deaths` int(11) NOT NULL,`playtimeSeconds` int(11) NOT NULL,`hdkills` int(11) NOT NULL,`csteamid` varchar(32) NOT NULL,`username` varchar(32) NOT NULL ,PRIMARY KEY (`id`))";
                     
                     setCommand.CommandText = CompileArguments(cmd2, args2, argsValues2);
                     setCommand.ExecuteNonQuery();
@@ -139,9 +137,9 @@ namespace OasisRanks
 
                 string[] args3 = { "@Tablename" };
                 string[] argsValues3 = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName };
-                string cmd3 = "SELECT * FROM `@Tablename` ORDER BY kills;";
+                string cmd3 = "SELECT * FROM `@Tablename` ORDER BY kills DESC;";
                 MySqlCommand command3 = mySqlConnection.CreateCommand();
-                command3.CommandText = CompileArguments(cmd2, args2, argsValues2);
+                command3.CommandText = CompileArguments(cmd3, args3, argsValues3);
                 var reader3 = command3.ExecuteReader();
 
                 int i = 0;
@@ -159,7 +157,7 @@ namespace OasisRanks
 
                 if ( ReturnStats.Kills != 0)
                 {
-                    ReturnStats.Accuracy = ReturnStats.HDKills / ReturnStats.Kills;
+                    ReturnStats.Accuracy = (float)ReturnStats.HDKills / (float)ReturnStats.Kills;
                 }
                 else
                 {
@@ -168,12 +166,13 @@ namespace OasisRanks
 
                 if (ReturnStats.Deaths != 0)
                 {
-                    ReturnStats.KDR = ReturnStats.Kills / ReturnStats.Deaths;
+                    ReturnStats.KDR = (float)ReturnStats.Kills / (float)ReturnStats.Deaths;
                 }
                 else
                 {
                     ReturnStats.KDR = ReturnStats.Kills;
                 }
+                ReturnStats.Accuracy *= 100;
                 mySqlConnection.Close();
             }
             catch (Exception ex)
@@ -225,9 +224,9 @@ namespace OasisRanks
             try
             {
 
-                string[] args = { "@Tablename", "@csteamid" };
+                string[] args = { "@Tablename", "@csteamid", "@csteamid" };
                 string[] argsValues = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName, csteamid.ToString()};
-                string cmd = "INSERT INTO `@Tablename` (`csteamid`,`kills`,`deaths`,`playtimeSeconds`,`hdkills`) VALUES(@csteamid,0,0,0,0);";
+                string cmd = "INSERT INTO `@Tablename` (`csteamid`,`kills`,`deaths`,`playtimeSeconds`,`hdkills`, `username`) VALUES(@csteamid,0,0,0,0);";
 
                 MySqlCommand command1 = mySqlConnection.CreateCommand();
                 command1.CommandText = CompileArguments(cmd, args, argsValues);
@@ -245,5 +244,51 @@ namespace OasisRanks
             }
         }
 
+        internal static List<PlayerRankComponent> RetrieveLeaders()
+        {
+            MySqlConnection mySqlConnection = Database.CreateConnection();
+            if (mySqlConnection == null)
+            {
+                Logger.LogWarning("MySql RetrieveLeaders Failed - Connection null");
+                return new List<PlayerRankComponent>();
+            }
+            try
+            {
+
+                List<PlayerRankComponent> list = new List<PlayerRankComponent>();
+
+                string[] args2 = { "@Tablename" };
+                string[] argsValues2 = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName };
+                string cmd2 = "SELECT * FROM `@Tablename` ORDER BY `kills` DESC LIMIT 4;";
+                MySqlCommand command2 = mySqlConnection.CreateCommand();
+                command2.CommandText = CompileArguments(cmd2, args2, argsValues2);
+                var reader2 = command2.ExecuteReader();
+                while (reader2.Read())
+                {
+                    list.Add(new PlayerRankComponent()
+                    {
+                        Kills = reader2.GetInt32("kills"),
+                        HDKills = reader2.GetInt32("hdkills"),
+                        Deaths = reader2.GetInt32("deaths"),
+                        PlaytimeSeconds = reader2.GetInt32("playtimeSeconds"),
+                        PlayerID = (CSteamID)ulong.Parse(reader2.GetString("csteamid")),
+                        Rank = (list.Count + 1),
+                        Accuracy = reader2.GetInt32("kills") != 0 ? (((float)reader2.GetInt32("hdkills") / (float)reader2.GetInt32("kills")) * 100) : 0,
+                        KDR = reader2.GetInt32("deaths") != 0 ? ((float)reader2.GetInt32("kills") / (float)reader2.GetInt32("deaths")) : reader2.GetInt32("kills"),
+                        Username = reader2.GetString("username")
+                    });
+                }
+                reader2.Close();
+                mySqlConnection.Close();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning("MySql RetrieveLeaders Failed");
+                Logger.LogException(ex);
+                mySqlConnection.Close();
+                return new List<PlayerRankComponent>();
+            }
+        }
     }
 }

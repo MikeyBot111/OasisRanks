@@ -1,5 +1,6 @@
 ﻿using Rocket.API;
 using Rocket.Unturned.Player;
+using Steamworks;
 
 namespace OasisRanks
 {
@@ -12,6 +13,7 @@ namespace OasisRanks
         public string DatabaseTableName;
         public int DatabasePort;
         public bool Enabled;
+        public int Cooldown;
 
         public void LoadDefaults()
         {
@@ -22,6 +24,7 @@ namespace OasisRanks
             DatabaseTableName = "OasisRanks";
             DatabasePort = 3306;
             Enabled = true;
+            Cooldown = 10;
         }
     }
 
@@ -32,8 +35,10 @@ namespace OasisRanks
         public int HDKills = 0;
         public int Deaths = 0;
         public float Accuracy = 0;
-        public int KDR = 0;
+        public float KDR = 0;
         public int Rank = 0;
         public int PlaytimeSeconds = 0;
+        public CSteamID PlayerID;
+        public string Username;
     }
 }
