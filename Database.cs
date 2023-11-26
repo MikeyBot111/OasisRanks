@@ -3,6 +3,7 @@ using Steamworks;
 using System;
 using System.Collections.Generic;
 using MySqlConnector;
+using Rocket.Unturned.Player;
 
 namespace OasisRanks
 {
@@ -224,9 +225,9 @@ namespace OasisRanks
             try
             {
 
-                string[] args = { "@Tablename", "@csteamid", "@csteamid" };
-                string[] argsValues = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName, csteamid.ToString()};
-                string cmd = "INSERT INTO `@Tablename` (`csteamid`,`kills`,`deaths`,`playtimeSeconds`,`hdkills`, `username`) VALUES(@csteamid,0,0,0,0);";
+                string[] args = { "@Tablename", "@csteamid", "@username" };
+                string[] argsValues = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName, csteamid.ToString(), UnturnedPlayer.FromCSteamID(csteamid).CharacterName};
+                string cmd = "INSERT INTO `@Tablename` (`csteamid`,`kills`,`deaths`,`playtimeSeconds`,`hdkills`, `username`) VALUES(@csteamid,0,0,0,0, @username);";
 
                 MySqlCommand command1 = mySqlConnection.CreateCommand();
                 command1.CommandText = CompileArguments(cmd, args, argsValues);
