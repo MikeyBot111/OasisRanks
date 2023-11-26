@@ -138,7 +138,7 @@ namespace OasisRanks
 
                 string[] args3 = { "@Tablename" };
                 string[] argsValues3 = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName };
-                string cmd3 = "SELECT * FROM `@Tablename` ORDER BY kills DESC;";
+                string cmd3 = "SELECT * FROM `@Tablename` ORDER BY `kills` DESC;";
                 MySqlCommand command3 = mySqlConnection.CreateCommand();
                 command3.CommandText = CompileArguments(cmd3, args3, argsValues3);
                 var reader3 = command3.ExecuteReader();
@@ -227,7 +227,7 @@ namespace OasisRanks
 
                 string[] args = { "@Tablename", "@csteamid", "@username" };
                 string[] argsValues = { OasisPlugin.Instance.Configuration.Instance.DatabaseTableName, csteamid.ToString(), UnturnedPlayer.FromCSteamID(csteamid).CharacterName};
-                string cmd = "INSERT INTO `@Tablename` (`csteamid`,`kills`,`deaths`,`playtimeSeconds`,`hdkills`, `username`) VALUES(@csteamid,0,0,0,0, @username);";
+                string cmd = "INSERT INTO `@Tablename` (`csteamid`,`kills`,`deaths`,`playtimeSeconds`,`hdkills`, `username`) VALUES('@csteamid' ,0 ,0 ,0 ,0 ,'@username');";
 
                 MySqlCommand command1 = mySqlConnection.CreateCommand();
                 command1.CommandText = CompileArguments(cmd, args, argsValues);
