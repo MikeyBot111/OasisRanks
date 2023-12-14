@@ -26,14 +26,14 @@ namespace OasisRanks
             {
                 return new TranslationList
                 {
-                    { "no_permissions": "[Oasis] You do not have permission for this command." },
-                    { "not_enabled": "[Oasis] This command is not enabled." },
-                    { "cooldown": "[Oasis] This command will be available in {0} seconds." },
-                    { "stats_no_player": "[Oasis] Player not found." },
-                    { "stats_show_0": "[Oasis] Player => {0}, Rank => {1}, Playtime => {2}s " },
-                    { "stats_show_1": "[Oasis] Kills => {0}, Deaths => {1}, Accuracy => {2}% " },
-                    { "stats_show_2": "[Oasis] KDR => {0}, Headshot kills => {1} " },
-                    { "ranks_player": "[Oasis] [{0}] {1}, Kills => {2}, Deaths => {3}, KDR => {4}, Accuracy => {5}%" }
+                    { "no_permissions", "[Oasis] You do not have permission for this command." },
+                    { "not_enabled", "[Oasis] This command is not enabled." },
+                    { "cooldown", "[Oasis] This command will be available in {0} seconds." },
+                    { "stats_no_player", "[Oasis] Player not found." },
+                    { "stats_show_0", "[Oasis] Player => {0}, Rank => {1}, Playtime => {2}s " },
+                    { "stats_show_1", "[Oasis] Kills => {0}, Deaths => {1}, Accuracy => {2}% " },
+                    { "stats_show_2", "[Oasis] KDR => {0}, Headshot kills => {1} " },
+                    { "ranks_player", "[Oasis] [{0}] {1}, Kills => {2}, Deaths => {3}, KDR => {4}, Accuracy => {5}%" }
                 };
             }
         }
